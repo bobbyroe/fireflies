@@ -1,40 +1,37 @@
-import { OBJLoader } from "https://cdn.jsdelivr.net/npm/three@0.118/examples/jsm/loaders/OBJLoader.js";
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js";
-console.log(`THREE REVISION: %c${THREE.REVISION}`, "color: #FFFF00");
-
+import * as THREE from "three";
+import { GLTFLoader } from "jsm/loaders/GLTFLoader.js";
+import { OrbitControls } from "jsm/controls/OrbitControls.js";
+import getBgSphere from "./src/getBgSphere.js";
 let w = window.innerWidth;
 let h = window.innerHeight;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 1000);
-camera.position.set(0, 1, 2.5);
+camera.position.set(0, 0, 5);
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(w, h);
 document.body.appendChild(renderer.domElement);
-const loader = new OBJLoader();
 
-function initScene(geo) {
-  // loaded geometry
-  const mat = new THREE.MeshStandardMaterial({
-    color: 0xffffff,
-    flatShading: true,
-    // wireframe: true,
-  });
-  const mesh = new THREE.Mesh(geo, mat);
-  scene.add(mesh);
+const ctrls = new OrbitControls(camera, renderer.domElement);
+ctrls.enableDamping = true;
 
-  function getPointLight (color) {
+const loader = new GLTFLoader();
 
-    const light = new THREE.PointLight( color, 1, 2.0);
+function initScene(glb) {
+  // glb.scale.setScalar(1.5);
+  // glb.position.y = 1;
+  scene.add(glb);
 
+  function getPointLight(color) {
+
+    const light = new THREE.SpotLight(color, 1);
     // light ball
-    const geo = new THREE.IcosahedronGeometry(0.01, 0);
-    const mat = new THREE.MeshBasicMaterial({color});
+    const geo = new THREE.IcosahedronGeometry(0.02, 2);
+    const mat = new THREE.MeshBasicMaterial({ color });
     const mesh = new THREE.Mesh(geo, mat);
     mesh.add(light);
 
     const circle = new THREE.Object3D();
-    circle.position.y = 1;
-    const radius = 1.25;
+    const radius = 2.5;
     mesh.position.x = radius;
     circle.rotation.x = THREE.MathUtils.degToRad(90);
     circle.rotation.y = Math.random() * Math.PI * 2;
@@ -61,7 +58,7 @@ function initScene(geo) {
     mesh.add(glowMesh4);
 
     const rate = Math.random() * 0.01 + 0.005;
-    function update () {
+    function update() {
       circle.rotation.z += rate;
     }
 
@@ -70,16 +67,6 @@ function initScene(geo) {
       update,
     };
   }
-
-  // const sunlight = new THREE.DirectionalLight(0xffffff);
-  // sunlight.position.x = -1;
-  // sunlight.position.y = 2;
-  // scene.add(sunlight);
-
-  // const bounceLight = new THREE.DirectionalLight(0x99aaaa);
-  // bounceLight.position.x = 1;
-  // bounceLight.position.y = -2;
-  // scene.add(bounceLight);
 
   const colors = [0xFF0000, 0x00FF00, 0x0000FF, 0xFFFF00, 0xFF00FF, 0x0099FF];
   const pLights = [];
@@ -90,21 +77,39 @@ function initScene(geo) {
     pLights.push(pLight);
   }
 
+  const bg = getBgSphere();
+  scene.add(bg);
+
   function animate() {
     requestAnimationFrame(animate);
-    pLights.forEach( l => l.update());
-    mesh.rotation.y += 0.005;
+    pLights.forEach(l => l.update());
+    glb.rotation.y += 0.005;
     renderer.render(scene, camera);
+    ctrls.update();
   }
   animate();
 }
 
-loader.load("./assets/hand.obj", (obj) => {
-  const { geometry } = obj.children[0];
-  initScene(geometry);
+loader.load("./assets/Astronaut.glb", (gltf) => {
+  const mat = new THREE.MeshPhysicalMaterial({
+    // color: 0x00ff00,
+    roughness: 0,
+    metalness: 1, 
+    // transmission: 1
+  });
+
+  gltf.scene.traverse((child) => {
+    if (child.isMesh) {
+      // child.scale.setScalar(0.05); 
+      // child.material = mat;
+      // child.material.metalness = 1;
+      child.geometry.center();
+    }
+  });
+  initScene(gltf.scene);
 });
 
-function handleWindowResize () {
+function handleWindowResize() {
   w = window.innerWidth;
   h = window.innerHeight;
   camera.aspect = w / h;
