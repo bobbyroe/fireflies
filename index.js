@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { GLTFLoader } from "jsm/loaders/GLTFLoader.js";
+import { FBXLoader } from "jsm/loaders/FBXLoader.js";
 import { OrbitControls } from "jsm/controls/OrbitControls.js";
 import getBgSphere from "./src/getBgSphere.js";
 let w = window.innerWidth;
@@ -14,15 +14,17 @@ document.body.appendChild(renderer.domElement);
 const ctrls = new OrbitControls(camera, renderer.domElement);
 ctrls.enableDamping = true;
 
-const loader = new GLTFLoader();
+const loader = new FBXLoader();
 
-function initScene(glb) {
+function initScene(fbx) {
   // glb.scale.setScalar(1.5);
   // glb.position.y = 1;
-  scene.add(glb);
+  scene.add(fbx);
 
-  function getPointLight(color) {
+  function getFirefly() {
 
+    const hue = 0.6 + Math.random() * 0.2;
+    const color = new THREE.Color().setHSL(hue, 1, 0.5);
     const light = new THREE.SpotLight(color, 1);
     // light ball
     const geo = new THREE.IcosahedronGeometry(0.02, 2);
@@ -68,45 +70,49 @@ function initScene(glb) {
     };
   }
 
-  const colors = [0xFF0000, 0x00FF00, 0x0000FF, 0xFFFF00, 0xFF00FF, 0x0099FF];
   const pLights = [];
   let pLight;
-  for (let i = 0; i < colors.length; i += 1) {
-    pLight = getPointLight(colors[i]);
+  for (let i = 0, numLights = 20; i < numLights; i += 1) {
+    pLight = getFirefly();
     scene.add(pLight.obj);
     pLights.push(pLight);
   }
 
-  const bg = getBgSphere();
+  const bg = getBgSphere({ hue: 0.8 });
   scene.add(bg);
+
+  // fbx.userData.action.reset();
+  fbx.userData.action.play();
 
   function animate() {
     requestAnimationFrame(animate);
     pLights.forEach(l => l.update());
-    glb.rotation.y += 0.005;
+    fbx?.userData.update();
     renderer.render(scene, camera);
     ctrls.update();
   }
   animate();
 }
 
-loader.load("./assets/Astronaut.glb", (gltf) => {
-  const mat = new THREE.MeshPhysicalMaterial({
-    // color: 0x00ff00,
-    roughness: 0,
-    metalness: 1, 
-    // transmission: 1
-  });
-
-  gltf.scene.traverse((child) => {
-    if (child.isMesh) {
-      // child.scale.setScalar(0.05); 
-      // child.material = mat;
-      // child.material.metalness = 1;
-      child.geometry.center();
+loader.load("./assets/Treading-Water.fbx", (fbx) => {
+  fbx.scale.setScalar(0.02);
+  fbx.position.set(0, -1.5, 0);
+  fbx.traverse((c) => {
+    if (c.isMesh) {
+      if (c.material.name === "Alpha_Body_MAT") {
+        c.material.shininess = 100;
+      }
     }
   });
-  initScene(gltf.scene);
+  const mixer = new THREE.AnimationMixer(fbx);
+  const update = (t) => {
+    mixer.update(0.015);
+  };
+  const anim = fbx.animations[0];
+  const action = mixer.clipAction(anim);
+  console.log(action);
+  fbx.userData = { action, mixer, update };
+  initScene(fbx);
 });
 
 function handleWindowResize() {
