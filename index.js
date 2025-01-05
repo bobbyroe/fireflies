@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { FBXLoader } from "jsm/loaders/FBXLoader.js";
 import { OrbitControls } from "jsm/controls/OrbitControls.js";
 import getBgSphere from "./src/getBgSphere.js";
+
 let w = window.innerWidth;
 let h = window.innerHeight;
 const scene = new THREE.Scene();
@@ -17,7 +18,6 @@ ctrls.enableDamping = true;
 const loader = new FBXLoader();
 
 function initScene(fbx) {
-  // glb.scale.setScalar(1.5);
   // glb.position.y = 1;
   scene.add(fbx);
 
@@ -94,34 +94,30 @@ function initScene(fbx) {
   animate();
 }
 
-loader.load("./assets/Treading-Water.fbx", (fbx) => {
+loader.load("./assets/Treading-Water-astro.fbx", (fbx) => {
   const mat = new THREE.MeshStandardMaterial({
     // color: 0x00ff00,
     roughness: 0.2,
     metalness: 1.0,
+    flatShading: false,
     // transmission: 1.0,
     // transparent: true,
     // opacity: 0.5,
   });
-
-  fbx.scale.setScalar(0.02);
   fbx.position.set(0, -1.5, 0);
   fbx.traverse((c) => {
     if (c.isMesh) {
-      if (c.material.name === "Alpha_Body_MAT") {
-        c.material = mat;
-      }
+      c.material = mat;
     }
   });
-  const mixer = new THREE.AnimationMixer(fbx);
-  const update = (t) => {
-    mixer.update(0.015);
-  };
-  const anim = fbx.animations[0];
-  const action = mixer.clipAction(anim);
-  console.log(action);
-  fbx.userData = { action, mixer, update };
-  initScene(fbx);
+const mixer = new THREE.AnimationMixer(fbx);
+const update = (t) => {
+  mixer.update(0.015);
+};
+const anim = fbx.animations[0];
+const action = mixer.clipAction(anim);
+fbx.userData = { action, mixer, update };
+initScene(fbx);
 });
 
 function handleWindowResize() {
