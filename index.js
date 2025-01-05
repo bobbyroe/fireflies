@@ -18,7 +18,6 @@ ctrls.enableDamping = true;
 const loader = new FBXLoader();
 
 function initScene(fbx) {
-  // glb.position.y = 1;
   scene.add(fbx);
 
   function getFirefly() {
@@ -78,7 +77,8 @@ function initScene(fbx) {
     pLights.push(pLight);
   }
 
-  const bg = getBgSphere({ hue: 0.575, lightnessMult: 0.005 });
+  const bg = getBgSphere({ hue: 0.65, lightnessMult: 0.05 });
+  bg.scale.setScalar(0.75);
   scene.add(bg);
 
   // fbx.userData.action.reset();
@@ -94,7 +94,7 @@ function initScene(fbx) {
   animate();
 }
 
-loader.load("./assets/Treading-Water-astro.fbx", (fbx) => {
+loader.load("./assets/Treading-Water.fbx", (fbx) => {
   const mat = new THREE.MeshStandardMaterial({
     // color: 0x00ff00,
     roughness: 0.2,
@@ -104,9 +104,12 @@ loader.load("./assets/Treading-Water-astro.fbx", (fbx) => {
     // transparent: true,
     // opacity: 0.5,
   });
+  fbx.scale.setScalar(0.02);
   fbx.position.set(0, -1.5, 0);
   fbx.traverse((c) => {
     if (c.isMesh) {
+      console.log(c);
+      // c.geometry.center();
       c.material = mat;
     }
   });
