@@ -25,7 +25,7 @@ function initScene(fbx) {
 
     const hue = 0.6 + Math.random() * 0.2;
     const color = new THREE.Color().setHSL(hue, 1, 0.5);
-    const light = new THREE.SpotLight(color, 1);
+    const light = new THREE.SpotLight(color, 2);
     // light ball
     const geo = new THREE.IcosahedronGeometry(0.02, 2);
     const mat = new THREE.MeshBasicMaterial({ color });
@@ -78,7 +78,7 @@ function initScene(fbx) {
     pLights.push(pLight);
   }
 
-  const bg = getBgSphere({ hue: 0.8 });
+  const bg = getBgSphere({ hue: 0.575, lightnessMult: 0.005 });
   scene.add(bg);
 
   // fbx.userData.action.reset();
@@ -95,12 +95,21 @@ function initScene(fbx) {
 }
 
 loader.load("./assets/Treading-Water.fbx", (fbx) => {
+  const mat = new THREE.MeshStandardMaterial({
+    // color: 0x00ff00,
+    roughness: 0.2,
+    metalness: 1.0,
+    // transmission: 1.0,
+    // transparent: true,
+    // opacity: 0.5,
+  });
+
   fbx.scale.setScalar(0.02);
   fbx.position.set(0, -1.5, 0);
   fbx.traverse((c) => {
     if (c.isMesh) {
       if (c.material.name === "Alpha_Body_MAT") {
-        c.material.shininess = 100;
+        c.material = mat;
       }
     }
   });
