@@ -23,7 +23,7 @@ async function loadFbx() {
     metalness: 1.0,
     flatShading: false,
   });
-  fbx.position.set(0, -1.5, 0);
+  fbx.position.set(0, -2.0, 0);
   fbx.traverse((c) => {
     if (c.isMesh) {
       c.material = mat;
@@ -47,7 +47,8 @@ function getFirefly() {
   let hue = 0.6 + Math.random() * 0.2;
   if (Math.random() < 0.02) { hue = 0.25; } // a rare green one
   const color = new THREE.Color().setHSL(hue, 1, 0.5);
-  const light = new THREE.SpotLight(color, 2); // more performant than PointLight
+  // more performant than PointLight
+  const light = new THREE.SpotLight(color, 2); 
   // light ball
   const geo = new THREE.IcosahedronGeometry(0.02, 2);
   const mat = new THREE.MeshBasicMaterial({ color });
