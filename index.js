@@ -43,12 +43,12 @@ const fbx = await loadFbx();
 scene.add(fbx);
 
 function getFirefly() {
-  
+
   let hue = 0.6 + Math.random() * 0.2;
   if (Math.random() < 0.02) { hue = 0.25; } // a rare green one
   const color = new THREE.Color().setHSL(hue, 1, 0.5);
   // more performant than PointLight
-  const light = new THREE.SpotLight(color, 2); 
+  const light = new THREE.SpotLight(color, 2);
   // light ball
   const geo = new THREE.IcosahedronGeometry(0.02, 2);
   const mat = new THREE.MeshBasicMaterial({ color });
@@ -86,7 +86,7 @@ function getFirefly() {
     glowMesh3.scale.multiplyScalar(4);
     const glowMesh4 = new THREE.Mesh(geo, glowMat);
     glowMesh4.scale.multiplyScalar(6);
-  
+
     mesh.add(glowMesh);
     mesh.add(glowMesh2);
     mesh.add(glowMesh3);
@@ -94,7 +94,7 @@ function getFirefly() {
   }
   const orbitObj = _getOrbitObj(mesh);
   _addGlow(mesh);
-  
+
   return orbitObj;
 }
 
