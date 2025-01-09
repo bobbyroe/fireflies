@@ -2,6 +2,8 @@
 
 This repository showcases a real-time 3D scene built with Three.js. The project features animated fireflies and an imported FBX model with animation.
 
+Tutorial on [YouTube](https://youtu.be/1sXqcs7F7g0)
+
 ## Features
 
 - **Animated Fireflies**: Dynamically orbiting fireflies with glow effects.
