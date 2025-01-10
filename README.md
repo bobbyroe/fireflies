@@ -9,6 +9,8 @@ Tutorial on [YouTube](https://youtu.be/1sXqcs7F7g0)
 - **Animated Fireflies**: Dynamically orbiting fireflies with glow effects.
 - **FBX Model Loading**: Imports and animates an FBX model using `FBXLoader`.
 
+Astronaut by Poly by Google [CC-BY](https://creativecommons.org/licenses/by/3.0/) via [Poly Pizza](https://poly.pizza/m/dLHpzNdygsg)
+
 ## Installation
 
 Clone the repository:
